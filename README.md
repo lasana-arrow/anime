@@ -8,7 +8,7 @@
 <p>Has some shortcodes for presenting blocks and animes</p>
 <p>Can be used to make an encyclopedia of different videos or films or animations or books (where you have the WHOLE art object as an object and parts of it as also art object) </p>
 <p>Going to rewrite it to make a plugin of this instead of theme</p>
-<p>Go and check how it works at nekoparade.com</p>
+<p>Go and check how it works at [nekoparade.com<](https://neko-parade.ru/)/p>
 <br><br>
-11.03.2023<br>
+18.07.2024<br>
 Lasana
