@@ -174,7 +174,11 @@ elseif (isset($_GET['post_type'])) {
 	while ( have_posts()  ) {
 	the_post();
 	echo ' <div> ';	
-	echo '<b> <a href="'.get_permalink($post->ID).'">'. get_the_title() . '/'.$post->_second_name.'/'.$post->_russian_name.'</a> ('.$post->_year.')  </b>';
+	echo '<b> <a href="'.get_permalink($post->ID).'">'. get_the_title() . ' <i class="fa-solid fa-paw"></i> '.$post->_russian_name.'</a> ('.$post->_year.')  </b>';
+	$catnum=has_cats($post->ID);
+    if ($catnum!=0)
+    echo '(<span class="hascats"><i class="fa-solid fa-cat"></i>'.$catnum.'</span>)'; 
+	else echo '<span>(проверено: котиков нет)</span>';	
 	echo '</div>';	
      }
 
@@ -225,8 +229,22 @@ elseif ( have_posts() ) {
 	} // End the loop.
 
 	// Previous/next page navigation.
-	twenty_twenty_one_the_posts_navigation();
+	///twenty_twenty_one_the_posts_navigation();
 
+the_posts_pagination( array(
+	'show_all'     => false, // показаны все страницы участвующие в пагинации
+	'end_size'     => 2,     // количество страниц на концах
+	'mid_size'     => 1,     // количество страниц вокруг текущей
+	'prev_next'    => true,  // выводить ли боковые ссылки "предыдущая/следующая страница".
+	'prev_text'    => __('« Начало'),
+	'next_text'    => __('Конец »'),
+	'add_args'     => false, // Массив аргументов (переменных запроса), которые нужно добавить к ссылкам.
+	'add_fragment' => '',     // Текст который добавиться ко всем ссылкам.
+	'screen_reader_text' => 'Страницы',
+	'class'        => 'pagination', // CSS класс, добавлено в 5.5.0.
+));
+	
+	
 	// If no content, include the "No posts found" template.
 }
 	else {
