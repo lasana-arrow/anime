@@ -1,27 +1,30 @@
 <?php
-/* 
- * Таксономии аниме                           37
- * Таксономии котоблоков                      307
- * Аниме                                      550 
- * Котоблок                                   590
- * Допполя таксономии контрибутера            634
- * Метабоксы к аниме                          657
- * Метабоксы к котоблокам                     984
- * Колонка Аниме в админке                    1046
- * Добавление картинок к таксономиям          1125 
+/* Корректируем привязки аниме к блокам       28
+ * Таксономии аниме                           64
+ * Таксономии котоблоков                      336
+ * Аниме                                      606 
+ * Котоблок                                   637
+ * Допполя таксономии контрибутера            725
+ * Допполя таксономии источника               774
+ * Метабоксы к аниме                          783
+ * Метабоксы к котоблокам                     1036
+ * Колонка Аниме в админке                    1147
+ * Добавление картинок к таксономиям          1222 
  * Шорткод showcatblock                       1251  
- * Шорткод howmanyanime
- * Шорткод howmanyblocks
- * Шаблон вывода по годам                     1343 
- * Шорткод showtaxonomy                       1500
- * Шорткод showanime                          1666 
- * Шорткод showcontributor                    1805 
- * Форматирование описаний для таксономий     1873 
- * Шорткод animesearch                        1942 
- * Шорткод complexsearch                      1988 
+ * Шорткод howmanyanime                       1517 
+ * Шорткод howmanyblocks                      1572 
+ * Шаблон вывода по годам                     1588 
+ * Шорткод showtaxonomy                       1650
+ * Шорткод showanime                          1882 
+ * Шорткод showcontributor                    1952 
+ * Шорткод showsource                         1999
+ * Форматирование описаний для таксономий     2042 
+ * Шорткод animesearch                        2113 
+ * Шорткод complexsearch                      2160 
+ * Функция has_cats                           2327
  *           
  * */
-
+add_filter( 'allow_dev_auto_core_updates', '__return_false' );
 require_once __DIR__ . '/WP_Term_Image.php'; // Наши картинки для таксономий
 
 
@@ -42,6 +45,7 @@ require_once __DIR__ . '/WP_Term_Image.php'; // Наши картинки для
 	 }
  }
 */
+
 // Добавляет ссылку на страницу всех настроек в пункт меню админки "Настройки"
 add_action('admin_menu', 'all_settings_link');
 function all_settings_link(){
@@ -62,8 +66,39 @@ add_theme_support( 'post-thumbnails', array( 'post', 'catblock' ) );
 
 
 add_action( 'init', 'create_anime_taxonomies');	
-// anime_contributor, anime_role, director, studio, anime_original, anime_original_author, anime_tax, anime_tag
+// anime_source, anime_contributor, anime_role, director, studio, anime_original, anime_original_author, anime_tax, anime_tag
+
 function create_anime_taxonomies(){	
+    // Источник иноформации
+	register_taxonomy( 'anime_source', [ 'anime' ], [
+		'label'                 => '', 
+		'labels'                => [
+			'name'              => __( 'Источники', 'anime' ),
+			'singular_name'     => __( 'Источник', 'anime' ),
+			'search_items'      => __( 'Искать', 'anime' ),
+			'all_items'         => __( 'Все', 'anime' ),
+			'view_item '        => __( 'Просмотреть', 'anime' ),
+			'edit_item'         => __( 'Редактировать', 'anime' ),
+			'update_item'       => __( 'Обновить', 'anime' ),
+			'add_new_item'      => __( 'Добавить источник', 'anime' ),
+			'new_item_name'     => __( 'Название', 'anime' ),
+			'menu_name'         => __( 'Источник', 'anime' ),
+		],
+		'description'           => 'Источник, из которого была взята информация об аниме', // описание таксономии
+		'public'                => true,
+	    'show_in_nav_menus'     => true, // равен аргументу public
+		'show_ui'               => true, // равен аргументу public
+		'show_in_quick_edit'    => true, // равен аргументу show_ui
+		'hierarchical'          => false,
+		'rewrite'               => true,
+		'query_var'             => 'anime_source', // название параметра запроса
+		'capabilities'          => array(),
+		'meta_box_cb'           => 'post_categories_meta_box', 
+		'show_admin_column'     => false, 
+		'show_in_rest'          => true, 
+		'rest_base'             => null, 
+	] );
+	
     // Контрибьюторы
 	register_taxonomy( 'anime_contributer', [ 'anime' ], [
 		'label'                 => '', 
@@ -78,6 +113,7 @@ function create_anime_taxonomies(){
 			'add_new_item'      => __( 'Добавить контрибьютора', 'anime' ),
 			'new_item_name'     => __( 'Название', 'anime' ),
 			'menu_name'         => __( 'Контрибьютор', 'anime' ),
+			
 		],
 		'description'           => 'Люди, которые привнесли вклад в работу', // описание таксономии
 		'public'                => true,
@@ -92,6 +128,9 @@ function create_anime_taxonomies(){
 		'show_admin_column'     => false, 
 		'show_in_rest'          => true, 
 		'rest_base'             => null, 
+		'show_in_quick_edit'    => true,
+		'sort'                  => true,
+	
 	] );
 	
 	// Вид участия
@@ -196,7 +235,7 @@ function create_anime_taxonomies(){
 		'public'                => true,
 	    'show_in_nav_menus'     => true, // равен аргументу public
 		'show_ui'               => true, // равен аргументу public
-		'show_in_quick_edit'    => true, // равен аргументу show_ui
+		'show_in_quick_edit'    => false, // равен аргументу show_ui
 		'hierarchical'          => true,
 		'rewrite'               => true,
 		'query_var'             => 'studio', // название параметра запроса
@@ -226,7 +265,7 @@ function create_anime_taxonomies(){
 		'public'                => true,
 	    'show_in_nav_menus'     => true, // равен аргументу public
 		'show_ui'               => true, // равен аргументу public
-		'show_in_quick_edit'    => true, // равен аргументу show_ui
+		'show_in_quick_edit'    => false, // равен аргументу show_ui
 		'hierarchical'          => false,
 		'rewrite'               => true,
 		'query_var'             => 'anime_original', // название параметра запроса
@@ -256,7 +295,7 @@ function create_anime_taxonomies(){
 		'public'                => true,
 	    'show_in_nav_menus'     => true, // равен аргументу public
 		'show_ui'               => true, // равен аргументу public
-		'show_in_quick_edit'    => true, // равен аргументу show_ui
+		'show_in_quick_edit'    => false, // равен аргументу show_ui
 		'hierarchical'          => false,
 		'rewrite'               => true,
 		'query_var'             => 'anime_original_author', // название параметра запроса
@@ -326,7 +365,7 @@ function create_anime_taxonomies(){
 		'query_var'             => 'anime_tag', // название параметра запроса
 		'capabilities'          => array(),
 		'meta_box_cb'           => 'post_categories_meta_box', 
-		'show_admin_column'     => false, 
+		'show_admin_column'     => true, 
 		'show_in_rest'          => true, 
 		'rest_base'             => null, 
 	] );
@@ -688,7 +727,7 @@ function create_catblock_posttype() {
 add_action( 'init', 'create_catblock_posttype', 0 );
 
 
-
+// Дополнительное поле "Ссыль" для контрибутеров
 // страница добавления категории
 function taxonomy_add_new_meta_field() {
 	// это добавит мета-поле на страницу добавления категории
@@ -736,6 +775,16 @@ function save_social_links( $term_id ) {
 
 	return $term_id;
 }
+	
+// Дополнительное поле "ссыль" для источников	
+
+add_action( 'anime_source_add_form_fields', 'taxonomy_add_new_meta_field', 10, 2 );
+add_action( 'anime_source_edit_form_fields', 'add_social_links' );
+
+// Сохраним значение произвольно поля
+add_action( 'edited_anime_source', 'save_social_links' );
+add_action( 'created_anime_source', 'save_social_links' );
+	
 
 // Добавляем метабоксы к аниме
 // 
@@ -758,6 +807,7 @@ function save_social_links( $term_id ) {
 // ...
 // anime_contributer_n - anime_role_n
 // n берётся из all_contributers
+// 13. Источник. Он без ролей, просто списком
 
 add_action('add_meta_boxes', 'anime_info_metabox_init'); 
 add_action('save_post', 'anime_info_metabox_save'); 
@@ -1514,22 +1564,72 @@ function create_catblock_shortcode($args)
 
 add_shortcode('showcatblock', 'create_catblock_shortcode');
 
-
-//Создаём шорткод [howmanyanime]
+//Создаём шорткод [howmanyanime title="Заголовок"
+//                              from ='yyyy-mm-dd'
+//                              to='yyyy-mm-dd'
+//                              month='mm'
+//                              year='yyyy'
+//                              ]
+//  то есть можно вывести:
+//  [howmanyanime] - напишет Аниме отсмотрено: 544
+//  или
+//  [howmanyanime month='4']   
+//  или
+//  [howmanyanime month='12' year='2022']                         
 //Создаём шорткод [howmanyblocks]
 function create_howmanyanime_shortcode($args)
-{   
+{  
 	$title=$args['title'];
+	$month=(int)$args['month'];
+	if ($args['year']!='') $year=(int)$args['year'];
+	else {
+		$today = getdate();
+		$year=$today['year'];}
 	if (!$title) $title='Аниме отсмотрено';
+	 if($month!=0)
+	 {$params = array(
+	'post_type'   => 'anime', 
+	'year'  => $year,
+	'monthnum' => $month,	 
+	'posts_per_page' => -1, 		 
+	'orderby' =>'date',	
+	'order' =>'DESC'	 
+					
+	
+  ); 
+	  $query = new WP_Query($params);
+	  $text_to_return.='<div class="date-anime">';
+       while($query->have_posts()) {
+	    $query->the_post();
+	    $text_to_return.='<a href="' . get_permalink() . '">' . get_the_title() . '</a> ';
+		$post_id = get_the_ID(); 
+		$catnum=has_cats($post_id);
+        if ($catnum!=0)
+        $text_to_return.='<span class="hascats" style="display: inline-block; margin-right: 5px;">(<i class="fa-solid fa-cat"></i>'.$catnum.')</span>'; 
+ 		else  $text_to_return.='(котиков нет)';
+		 $text_to_return.='<span style="display: inline-block; margin-left: 5px; margin-right: 5px;"></span></span>';
+          }
+      
+		$text_to_return.='</div>';
+        wp_reset_postdata();}
+	else
+	{
 	$my_posts = get_posts( array(
 	'post_type'   => 'anime',
-    'posts_per_page' => -1,
+	'posts_per_page' => -1,
 	'suppress_filters' => true, // подавление работы фильтров изменения SQL запроса
      ) );
-     $text_to_return='<div class="allanime"><h4>'.$title.': '.sizeof($my_posts).'</h4></div>';
+		$nekoanime=0;
+		foreach ($my_posts as $mypost)
+			if (has_cats($mypost->ID)!=0)
+				$nekonanime++;
+     $text_to_return='<div class="allanime"><h4>'.$title.': '.$nekonanime.'</h4></div>';
 	 wp_reset_query(); 
+	}
 	 return $text_to_return;
 }
+
+
 function create_howmanyblocks_shortcode($args)
 {   $title=$args['title'];
 	if (!$title) $title='Котиков поймано';
@@ -1778,9 +1878,10 @@ function create_taxonomy_shortcode($args)
 	}
 add_shortcode('showtaxonomy', 'create_taxonomy_shortcode');
 
-
 // Создаём шорткод [showanime per_page=-1
-//                            year=0] 
+//                            year=0
+//                            show_years=true/false
+//                            show_alphabet=true/false] 
 // 
 //       
 
@@ -1790,9 +1891,14 @@ function create_showanime_shortcode($args)
 	                   array(
 						   'per_page'=>-1,
 						   'year'=>0,
+						   'show_years'=>true,
+						   'show_alphabet'=>true
 						), $args);
 	$params['per_page']=(int)$params['per_page'];
 	$params['year']=(int)$params['year'];
+    $params['show_years']=$params['show_years'];
+    $params['show_alphabet']=$params['show_alphabet'];
+        
 	
     // Это будет переменная, в которую мы будем записывать вывод на экран и которую будем возвращать
 	$text_to_return='';
@@ -1807,9 +1913,34 @@ function create_showanime_shortcode($args)
                  'order' => 'ASC',
 	            ) );
 		if ($animes)
-		{
+		{ 
+			wp_reset_postdata();
+			 $animes = get_posts( array(
+	             'post_type' => 'anime',
+	             'posts_per_page' => $params['per_page'],
+                 'orderby' => 'title',
+                 'order' => 'ASC',
+	            ) );
+			if ($params['show_alphabet']==true)
+			{ //Вывод алфавита
+				$letters=array();
+				foreach ($animes as $anime)
+			{  $catnum=has_cats($anime->ID);
+				if(($catnum>0)&&(!in_array(mb_substr($anime->post_title, 0, 1),$letters)))
+					$letters[]=mb_substr($anime->post_title, 0, 1);
+					
+				}
+				$text_to_return.='<div style="margin: 0 20px; padding-bottom: 20px; text-align: center;">';
+				foreach ($letters as $ltr)
+					if ($ltr!='<')
+				   $text_to_return.='<span class="alphabet"><a href="#'.$ltr.'">'.$ltr.'</a></span><i class="fa-solid fa-paw"></i>';	            $text_to_return.='</div>';
+			}
+			 // Если нужно вывести года
+         if ($params['show_years']==true)
+          {
 			$years=array();
 			$first_anime=array();
+			 
 			foreach ($animes as $anime)
 			{
 				if (!in_array($anime->_year, $years))
@@ -1819,25 +1950,33 @@ function create_showanime_shortcode($args)
 				}
 			}
 			$text_to_return.='<div>';
+			sort ($years); 
 			foreach ($years as $year)
 			{
 	$text_to_return.='<a href="'.get_site_url().'?year='.$year.'">'.$year.'</a> <span style="padding-left: 5px;"><i class="fa-solid fa-paw"></i></span> ';
 			}
 			$text_to_return.='</div>';
 			$text_to_return.='<div style="display: block; height: 20px; border-bottom: 1px solid #000"></div>';
-			wp_reset_postdata();
-			 $animes = get_posts( array(
-	             'post_type' => 'anime',
-	             'posts_per_page' => $params['per_page'],
-                 'orderby' => 'title',
-                 'order' => 'ASC',
-	            ) );
+            }
 			
+	   // Выводим сами аниме
+	   $curletter='';
+	   $text_to_return.='<div>';
+	   		
 			foreach ($animes as $anime)
-			{   
-				  $text_to_return.='<p style="margin: 5px 0;"><a href="'.get_permalink($anime).'">'.$anime->post_title.'</a></p>';
+			{     $catnum=has_cats($anime->ID);
+			      if ($curletter!=mb_strtoupper(mb_substr($anime->post_title, 0, 1, 'utf-8')))
+				  {   $curletter=mb_strtoupper(mb_substr($anime->post_title, 0, 1, 'utf-8')); 
+					  $text_to_return.='</div><div id="'.$curletter.'">';
+				  }
+                  $text_to_return.='<p style="margin: 5px 0;"><a href="'.get_permalink($anime).'">'.$anime->post_title.'</a>';
+			  if ($catnum!=0)
+                  $text_to_return.='<span class="hascats">(<i class="fa-solid fa-cat" style="display: inline-block; margin-right: 4px;"></i>'.$catnum.')</span>'; 
+ 			  else  $text_to_return.='(котиков нет)';
+			  $text_to_return.='</p>';
 			    
 			}
+			$text_to_return.='</div>';
 		}
 		
 		
@@ -1847,7 +1986,9 @@ return $text_to_return;
 
 add_shortcode('showanime', 'create_showanime_shortcode');
 
-// Создаём шорткод [showcontibutor id=0] 
+// Создаём шорткод [showcontibutor id=0 
+//                                 shownums='true'/'false'] 
+//
 // 
 //       
 
@@ -1856,10 +1997,12 @@ function create_showcontibutor_shortcode($args)
 	$params=shortcode_atts(
 	                   array(
 						   'id'=>0,
+						   'shownums'=>'true'
 						), $args);
 	
 	$params['id']=(int)$params['id'];
-	$text_to_return='<div>';
+	$params['shownums']=$params['shownums'];
+	$text_to_return='<div class="source">';
 	if ($params['id']==0)
 	{
 		// а у нас других и нету :D
@@ -1868,30 +2011,30 @@ function create_showcontibutor_shortcode($args)
 		{
 		foreach ($people_cats as $otaku)	
 		{
-		$text_to_return.='<div><a href="'. get_term_link($otaku->term_id, $otaku->taxonomy).'">'.$otaku->name.'</a> ';	
-		$socials=get_term_meta($otaku->term_id, 'socials', true );		
+		$text_to_return.='<div class="otaku"><a href="'. get_term_link($otaku->term_id, $otaku->taxonomy).'">'.$otaku->name.'</a> ';	
+		//$socials=get_term_meta($otaku->term_id, 'socials', true );		
        // if ($socials!='') $text_to_return.='<a href="'.$socials.'"><i class="fa fa-link"></i></a>';
-		$text_to_return.=': ';
-		
-        $animes = get_posts( array(
-     	'tax_query' => array(
-		     array(
-			'taxonomy' => 'anime_contributer',
-			'field'    => 'id',
-			'terms'    => $otaku->term_id,			
-		     )
-	         ),
-	    'post_type' => 'anime',
-	    'posts_per_page' => -1,
-	      ) );
+		if ($params['shownums']=='true')
+			{	
+		     $text_to_return.=': ';
+		     $animes = get_posts( array(
+     	     'tax_query' => array(
+		        array(
+			  'taxonomy' => 'anime_contributer',
+			  'field'    => 'id',
+			  'terms'    => $otaku->term_id,			
+		       )
+	           ),
+	        'post_type' => 'anime',
+	         'posts_per_page' => -1,
+	           ) );
 	    if ($animes)
-		{$allblocks_num=sizeof($animes);
-		
+		{$allblocks_num=sizeof($animes);		
 		$text_to_return.=''.$allblocks_num.'';	
 		}
+		}
 			$text_to_return.='</div>';
-		
-		}		
+				}	
 		
 	}
 	$text_to_return.='</div>';
@@ -1900,6 +2043,38 @@ function create_showcontibutor_shortcode($args)
 }
 
 add_shortcode('showcontibutor', 'create_showcontibutor_shortcode');
+
+// Создаём шорткод [showsource id=0 ] 
+// 
+//       
+
+function create_showsource_shortcode($args)
+{
+	$params=shortcode_atts(
+	                   array(
+						   'id'=>0,
+						), $args);
+	
+	$params['id']=(int)$params['id'];
+	$text_to_return='<div class="source">';
+	if ($params['id']==0)
+	{
+	// а у нас других и нету :D
+     $sources=get_terms('anime_source','orderby=name&hide_empty=0');
+	 if ($sources)
+	 {
+	  foreach ($sources as $source)	
+	{
+	$text_to_return.='<span class="otaku"><a href="'. get_term_link($source->term_id, $source->taxonomy).'">'.$source->name.'</a> ';	$text_to_return.='</span><span style="padding: 0 5px 0 5px;"><i class="fa-solid fa-paw"></i></span>';
+				}			
+	}
+	$text_to_return.='</div>';
+	}
+	return $text_to_return;
+}
+
+add_shortcode('showsource', 'create_showsource_shortcode');
+
 
 /** ВЫВОДИМ ТЕКСТОВЫЙ РЕДАКТОР в редактировать категории **/
 function html_category_description($container = ''){
@@ -1923,7 +2098,7 @@ remove_filter( 'pre_term_description', 'wp_filter_kses' );
 remove_filter( 'term_description', 'wp_kses_data' );
 add_filter( 'term_description', 'wpautop' );
 
-/** фин: редактор в полях - убираем старое поле редактирования **/
+/** редактор в полях - убираем старое поле редактирования **/
 function remove_prev_category_description(){
 global $mk_description;
 if ( $mk_description->id == 'edit-category' or 'edit-tag' ){
@@ -1939,23 +2114,23 @@ $('textarea#description').closest('tr.form-field').remove();
 
 add_action('admin_head', 'remove_prev_category_description');          
    
-add_filter('anime_tag_edit_form_fields', 'html_category_description'); 
-add_filter('anime_tax_edit_form_fields', 'html_category_description'); 
-add_filter('director_edit_form_fields', 'html_category_description'); 
-add_filter('anime_original_edit_form_fields', 'html_category_description'); 
-add_filter('anime_original_author_edit_form_fields', 'html_category_description');
-add_filter('anime_contributer_edit_form_fields', 'html_category_description');
-add_filter('anime_role_edit_form_fields', 'html_category_description'); 
-add_filter('anime_type_edit_form_fields', 'html_category_description'); 
-add_filter('studio_edit_form_fields', 'html_category_description');
+//add_filter('anime_tag_edit_form_fields', 'html_category_description'); 
+//add_filter('anime_tax_edit_form_fields', 'html_category_description'); 
+//add_filter('director_edit_form_fields', 'html_category_description'); 
+//add_filter('anime_original_edit_form_fields', 'html_category_description'); 
+//add_filter('anime_original_author_edit_form_fields', 'html_category_description');
+//add_filter('anime_contributer_edit_form_fields', 'html_category_description');
+//add_filter('anime_role_edit_form_fields', 'html_category_description'); 
+//add_filter('anime_type_edit_form_fields', 'html_category_description'); 
+//add_filter('studio_edit_form_fields', 'html_category_description');
 
-add_filter('color_edit_form_fields', 'html_category_description');
-add_filter('format_edit_form_fields', 'html_category_description');
-add_filter('position_in_shot_edit_form_fields', 'html_category_description');
-add_filter('supernaturality_edit_form_fields', 'html_category_description');
-add_filter('acting_in_shot_edit_form_fields', 'html_category_description'); 
-add_filter('acting_in_story_edit_form_fields', 'html_category_description'); 
-add_filter('catname_edit_form_fields', 'html_category_description'); 
+//add_filter('color_edit_form_fields', 'html_category_description');
+//add_filter('format_edit_form_fields', 'html_category_description');
+//add_filter('position_in_shot_edit_form_fields', 'html_category_description');
+//add_filter('supernaturality_edit_form_fields', 'html_category_description');
+//add_filter('acting_in_shot_edit_form_fields', 'html_category_description'); 
+//add_filter('acting_in_story_edit_form_fields', 'html_category_description'); 
+//add_filter('catname_edit_form_fields', 'html_category_description'); 
 
 /* Plugin Name: TinyMCE break instead of paragraph */
 function mytheme_tinymce_settings( $tinymce_init_settings ) {
@@ -2183,4 +2358,26 @@ $form = '<form role="search" method="get" class="complexsearch" id="searchform" 
 	return $form;	
 }
 add_shortcode('complexsearch', 'create_complexsearch_shortcode');
+
+function has_cats($id)
+{   $catnum=0;
+	$args=array(
+		'post_type'=>'catblock',
+		'posts_per_page'=>'-1',
+		'orderby'     => 'meta_value',
+		'meta_key'    => '_block_id', 
+	    'order'       => 'DESC'
+		); 
+   $args['meta_query']=array(
+		            array(
+					'key'=>'_anime_id',
+					'value'=>$id
+					));
+  $allposts=get_posts($args);
+  if ($allposts)
+     $catnum=sizeof($allposts);
+  
+	return $catnum;
+}
+	
 ?>

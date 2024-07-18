@@ -78,7 +78,7 @@ $animes = get_posts( array(
 				  $role=get_term($role_id, 'anime_role'); 	
 	      //        echo '<span class="block-term"><a href="'. get_term_link( $role->term_id, $role->taxonomy).'">'.$role->name.'</a>';
 				  echo $role->name;
-				  if ($i<$n-1) echo ', ';
+				  if ($i<$n-1) echo '<span style="padding: 0 5px 0 5px;"><i class="fa-solid fa-paw"></i></span>  ';
 				  echo '</span>';
 				}
 			}

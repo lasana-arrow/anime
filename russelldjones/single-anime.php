@@ -24,6 +24,7 @@ echo '<div><h4><a href="';
 echo get_site_url();
 echo '?year='.$post->_year.'">'.$post->_year.'</a></h4></div>';
 //print_r($post);
+
 $anime_type = get_post_meta($post->ID, '_anime_type', true);
 if ((isset($anime_type))&&($anime_type>0))
 {$br = get_term($anime_type, 'anime_type');
@@ -32,13 +33,30 @@ if ((isset($anime_type))&&($anime_type>0))
 if (isset ($anime_type_name))
 echo '<div><h4><a href="'. get_term_link( $br->term_id, $br->taxonomy ) .'"> '.$anime_type_name.'</a></h4></div>';
 
+
 if (($anime_type>=157)&&($anime_type<=159))
 {$series = $post->_series;
 if(!isset($series)) $series='0';
 echo '<div><b>Серий:</b> '.$series.'</div>';
 }
+// 10. Категория (таксономия anime_tax)
+  $formats=get_the_terms($post->id, 'anime_tax');
+            if( is_array( $formats ) ){
+			echo '<div><b>Время:</b>';	
+	        foreach( $formats as $format ){
+	    	echo '<span class="block-term"><a href="'. get_term_link( $format->term_id, $format->taxonomy ) .'">'. $format->name .'</a></span><span style="padding-left: 5px; padding-right: 5px;"><i class="fa-solid fa-paw"></i></span>';
+	           }
+            }
 
-
+// 7. Студия (таксономия studio)  
+            $formats=get_the_terms($post->id, 'studio');
+            if( is_array( $formats ) ){
+			echo '<div><b>Студия:</b>';	
+	        foreach( $formats as $format ){
+	    	echo '<span class="block-term"><a href="'. get_term_link( $format->term_id, $format->taxonomy ) .'">'. $format->name .'</a></span><span style="padding-left: 5px; padding-right: 5px;"><i class="fa-solid fa-paw"></i></span>';
+	           }
+            }
+             echo '</div>'; 
 // 6. Режиссёр (таксономия  director)                    
 
             $formats=get_the_terms($post->id, 'director');
@@ -49,16 +67,6 @@ echo '<div><b>Серий:</b> '.$series.'</div>';
 	           }
             }
              echo '</div>'; 
-// 7. Студия (таксономия studio)  
-            $formats=get_the_terms($post->id, 'studio');
-            if( is_array( $formats ) ){
-			echo '<div><b>Студия:</b>';	
-	        foreach( $formats as $format ){
-	    	echo '<span class="block-term"><a href="'. get_term_link( $format->term_id, $format->taxonomy ) .'">'. $format->name .'</a></span><span style="padding-left: 5px; padding-right: 5px;"><i class="fa-solid fa-paw"></i></span>';
-	           }
-            }
-             echo '</div>'; 
-
 // 8. Оригинал (таксономия anime_original)  
 
   $formats=get_the_terms($post->id, 'anime_original');
@@ -81,14 +89,7 @@ echo '<div><b>Серий:</b> '.$series.'</div>';
             }
              echo '</div>'; 
 
-// 10. Категория (таксономия anime_tax)
-  $formats=get_the_terms($post->id, 'anime_tax');
-            if( is_array( $formats ) ){
-			echo '<div><b>Время:</b>';	
-	        foreach( $formats as $format ){
-	    	echo '<span class="block-term"><a href="'. get_term_link( $format->term_id, $format->taxonomy ) .'">'. $format->name .'</a></span><span style="padding-left: 5px; padding-right: 5px;"><i class="fa-solid fa-paw"></i></span>';
-	           }
-            }
+
              echo '</div>';  
 
 // 11. Тэг (таксономия anime_tag)
@@ -101,10 +102,15 @@ echo '<div><b>Серий:</b> '.$series.'</div>';
             }
              echo '</div>';  
 
+$catnum=has_cats($post->ID);
+if ($catnum!=0)
+echo '<div class="hascats"><i class="fa-solid fa-cat"></i>'.$catnum.'</div>'; 
+else echo '<div class="alert"><h3>Проверено: котиков нет!</h3></div>';
+
 echo '</div></div>';
 
 echo '<div class="container anime"><div class="row">';
-
+if ($catnum!=0)
 echo do_shortcode('[showcatblock anime="'.$post->ID.'"]');
 echo '</div>';		
 echo '<div class="row"><h4> Составители и редакторы</h4></div>';
@@ -142,6 +148,21 @@ if ((isset($chnum))&&($chnum>0))
 }
 echo '</div>'; 
 }
+
+echo '<div class="row">Использована информация из ';
+
+$sources=get_the_terms($post->ID, 'anime_source');
+	if( is_array( $sources ) ){				
+	        foreach( $sources as $source )
+			{ 
+			 $socials=get_term_meta( $source->term_id, 'socials', true );
+			 echo '<b><a href="'. get_term_link( $source->term_id, $source->taxonomy ).'">'.$source->name.'</a></b>';
+			  if ($socials!='')	
+			 echo '<span class="block-term"><a href="'.$socials.'"><i class="fa fa-link"></i></a></span>';	
+			 echo '<span style="padding: 0 5px 0 5px;"><i class="fa-solid fa-paw"></i></span>';	
+			}
+	}
+echo '</div>';
 endwhile; // End of the loop.
 echo '</div>';
 
